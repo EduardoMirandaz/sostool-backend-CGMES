@@ -44,11 +44,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Log into GitHub Container Registry
+        run: docker login -u eduardomirandaz --password ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Docker image
         run: docker build -t eduardomirandaz/sostool-backend-cgmes:1.0.0 .
-
-      - name: Log into GitHub Container Registry
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push Docker image
         run: docker push ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.0

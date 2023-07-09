@@ -16,11 +16,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
       - name: Build
         run: |
-          echo "Compiling the code..."
           mvn clean install -DskipTests -f ./pom.xml
-          echo "Compile complete."
 
   unit_test_job:
     needs: build_job
@@ -29,8 +28,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
       - name: Unit tests
         run: |
-          echo "Running unit tests..."
           mvn test -f ./pom.xml
-          echo "Code coverage is 100%"
+
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t EduardoMirandaz/sostool-backend-CGMES:latest .
+
+      - name: Log into GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Docker image
+        run: docker push ghcr.io/EduardoMirandaz/sostool-backend-CGMES:latest

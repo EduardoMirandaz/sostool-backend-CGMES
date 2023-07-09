@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Log into GitHub Container Registry
-        run: docker login ghcr.io -u eduardomirandaz --password ${{ secrets.GITHUB_TOKEN }}
+        run: docker login ghcr.io -u eduardomirandaz --password ${{ secrets.SOSTOOL_TOKEN }}
 
       - name: Build Docker image
         run: docker build -t ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.0 .

@@ -10,19 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_job:
-    runs-on: ubuntu-latest
-    container: maven:3.6.3-openjdk-11
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Build
-        run: |
-          mvn clean install -DskipTests -f ./pom.xml
-
   unit_test_job:
-    needs: build_job
     runs-on: ubuntu-latest
     container: maven:3.6.3-openjdk-11
     steps:
@@ -33,7 +21,19 @@ jobs:
         run: |
           mvn test -f ./pom.xml
 
-  build:
+  build_job:
+    needs: unit_test_job
+    runs-on: ubuntu-latest
+    container: maven:3.6.3-openjdk-11
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          mvn clean install -DskipTests -f ./pom.xml
+
+  publish:
     name: Build Docker Image
     needs: build_job
     runs-on: ubuntu-latest

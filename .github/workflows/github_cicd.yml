@@ -22,18 +22,6 @@ jobs:
         run: |
           mvn test -f ./pom.xml
 
-  functional_test_job:
-    name: Execute functional tests
-    runs-on: ubuntu-latest
-    container: maven:3.6.3-openjdk-11
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Functional tests
-        run: |
-          mvn test -f ./pom.xml
-
   build_job:
     name: Build jar file
     needs: unit_test_job
@@ -60,7 +48,7 @@ jobs:
         run: echo ${{ secrets.SOSTOOL_TOKEN }} | docker login ghcr.io -u eduardomirandaz --password-stdin
         
       - name: Build Docker image
-        run: docker build -t ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.1 .
+        run: docker build -t ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.2 .
 
       - name: Push Docker image
-        run: docker push ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.1
+        run: docker push ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.2

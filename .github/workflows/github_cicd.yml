@@ -10,27 +10,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_job:
-    runs-on: ubuntu-latest
-    container: maven:3.6.3-openjdk-11
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Build
-        run: |
-          echo "Compiling the code..."
-          mvn clean install -DskipTests -f ./pom.xml
-          echo "Compile complete."
-
   unit_test_job:
-    needs: build_job
+    name: Execute unit tests
     runs-on: ubuntu-latest
     container: maven:3.6.3-openjdk-11
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
       - name: Unit tests
         run: |
-          echo "Running unit tests..."
           mvn test -f ./pom.xml
-          echo "Code coverage is 100%"
+
+  build_job:
+    name: Build jar file
+    needs: unit_test_job
+    runs-on: ubuntu-latest
+    container: maven:3.6.3-openjdk-11
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          mvn clean install -DskipTests -f ./pom.xml
+        
+  publish:
+    name: Build and Push Docker Image
+    needs: build_job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log into GitHub Container Registry
+        run: echo ${{ secrets.SOSTOOL_TOKEN }} | docker login ghcr.io -u eduardomirandaz --password-stdin
+        
+      - name: Build Docker image
+        run: docker build -t ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.2 .
+
+      - name: Push Docker image
+        run: docker push ghcr.io/eduardomirandaz/sostool-backend-cgmes:1.0.2
